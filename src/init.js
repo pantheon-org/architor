@@ -146,6 +146,7 @@ async function walkDir(dir) {
   const results = [];
   const entries = await fs.readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
+    if (entry.isSymbolicLink()) continue; // Skip symlinks for safety
     const relPath = entry.name;
     if (entry.isDirectory()) {
       const subResults = await walkDir(path.join(dir, entry.name));

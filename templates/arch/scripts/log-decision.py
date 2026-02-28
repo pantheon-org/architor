@@ -34,15 +34,25 @@ def ensure_decisions_file():
             f.write("---\n\n")
 
 
+def sanitize_md(value):
+    """Strip markdown-active characters from logged values."""
+    if not isinstance(value, str):
+        value = str(value)
+    return value.replace('|', '').replace('[', '').replace(']', '').replace('\n', ' ').replace('\r', '')[:200]
+
+
 def append_state_snapshot(file_changed):
     ensure_decisions_file()
     summary = get_state_summary()
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    phase = sanitize_md(summary['phase'])
+    filename = sanitize_md(os.path.basename(file_changed))
+    dec_count = summary['decision_count']
     entry = (
         f"_[{timestamp}] State change detected: "
-        f"Phase={summary['phase']}, "
-        f"File={os.path.basename(file_changed)}, "
-        f"Decisions={summary['decision_count']}_\n\n"
+        f"Phase={phase}, "
+        f"File={filename}, "
+        f"Decisions={dec_count}_\n\n"
     )
     with open(DECISIONS_FILE, "a") as f:
         f.write(entry)

@@ -1,6 +1,6 @@
 {
   "name": "architor",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Turn Claude Code into a rigorous, phase-gated architecture design assistant",
   "license": "MIT",
   "author": "Architecture Agent Contributors",

@@ -70,6 +70,15 @@ Every decision appended to `.arch/decisions.md`:
 - `/generate-docs` — Phase 4: Validate and generate final architecture document
 - `/help` — Show available commands and current phase guidance
 
+## Security Constraints — ENFORCED BY HOOKS
+
+- **Scripts are READ-ONLY.** You MUST NOT write to `.arch/scripts/`. Enforcement hooks run automatically — you never invoke them directly.
+- **Phase transitions are validated.** A Python hook blocks any illegal state.json write (skipping phases, backward transitions without `/reopen`, injecting accepted components, deleting non-pending components).
+- **Reopen limits are immutable.** The `reopens.max` value is read from the current on-disk state, not from proposed writes. You cannot change it.
+- **Only recognized phases are valid.** The phases are: `not_started`, `evaluation`, `methodology`, `components`, `finalization`. Any other phase name is blocked.
+- **All-accepted is computed dynamically.** Setting `all_accepted: true` without all components having `status: "accepted"` will not bypass the finalization gate.
+- **Schema types are enforced.** `current_phase` must be a string, `phases` must be an object, `decision_count` must be a number.
+
 ## Technology Knowledge
 
 When recommending technologies:

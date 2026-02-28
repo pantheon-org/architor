@@ -2,6 +2,35 @@
 
 All notable changes to Architor are documented here.
 
+## [2.0.1] — 2026-02-28
+
+### Security Hardening (9 zero-impact fixes)
+
+All fixes block adversarial/malformed input only. Normal workflow is 100% identical.
+
+**Critical**
+- Closed Write+Execute chain: scripts are now read-only (`Write(.arch/scripts/*)` denied), direct script execution removed from allowedTools, `cat`/`ls` scoped to `.arch/` and `output/`
+
+**High**
+- Reopen limit bypass: `reopens.max` now read from trusted on-disk state, not proposed state
+- Unknown phase bypass: phase name allowlist blocks unrecognized phases
+- Dynamic `all_accepted`: finalization gate now computes all-components-accepted from actual component statuses instead of trusting a flag
+
+**Medium**
+- Schema type validation: `current_phase` must be string, `phases` must be object, `decision_count` must be number
+- Log sanitization: markdown-active characters stripped from logged values
+
+**Low**
+- stdin limited to 1MB in validation hook
+- Backup failures logged to stderr instead of silently swallowed
+
+**Other**
+- Added `Security Constraints` section to CLAUDE.md
+- Symlink safety in CLI `walkDir` function
+- 10 new security tests (40 total)
+
+---
+
 ## [2.0.0] — 2026-02-27
 
 ### npm CLI Distribution

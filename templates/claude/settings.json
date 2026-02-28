@@ -4,14 +4,16 @@
       "Read",
       "Write(.arch/*)",
       "Write(output/*)",
-      "Bash(python3 .arch/scripts/*)",
-      "Bash(cat *)",
-      "Bash(ls *)",
+      "Bash(cat .arch/*)",
+      "Bash(cat output/*)",
+      "Bash(ls .arch/*)",
+      "Bash(ls output/*)",
       "Bash(date *)"
     ],
     "deny": [
       "Write(CLAUDE.md)",
-      "Write(.claude/*)"
+      "Write(.claude/*)",
+      "Write(.arch/scripts/*)"
     ]
   },
   "hooks": {

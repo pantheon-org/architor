@@ -422,3 +422,216 @@ describe('Component status transitions', () => {
     expect(result.exitCode).toBe(1);
   });
 });
+
+// ===== SECURITY HARDENING TESTS =====
+
+describe('Security: Reopen limit bypass (Fix 2)', () => {
+  it('blocks reopen when proposed state has inflated max', () => {
+    const current = makeState({
+      current_phase: 'components',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+      },
+      reopens: { count: 2, max: 2, history: [{}, {}] },
+    });
+    const proposed = makeState({
+      current_phase: 'methodology',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: false },
+      },
+      // Attacker sets max: 999 in proposed state
+      reopens: { count: 3, max: 999, history: [{}, {}, {}] },
+    });
+    const result = runValidatorLocal(current, proposed);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Maximum reopens');
+  });
+});
+
+describe('Security: Unknown phase bypass (Fix 3)', () => {
+  it('blocks transition to unknown phase name', () => {
+    const current = makeState({
+      current_phase: 'evaluation',
+      phases: { evaluation: { accepted: true } },
+    });
+    const proposed = makeState({
+      current_phase: 'admin',
+      phases: { evaluation: { accepted: true } },
+    });
+    const result = runValidatorLocal(current, proposed);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('not a recognized phase');
+  });
+
+  it('blocks transition from unknown phase name', () => {
+    // Simulate corrupted state on disk with unknown phase
+    const current = makeState({ current_phase: 'evaluation' });
+    current.current_phase = 'hacked';
+    const proposed = makeState({ current_phase: 'evaluation' });
+    const result = runValidatorLocal(current, proposed);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('not a recognized phase');
+  });
+});
+
+describe('Security: Dynamic all_accepted (Fix 4)', () => {
+  it('blocks finalization when all_accepted flag is true but no components exist', () => {
+    const current = makeState({
+      current_phase: 'components',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+        components: {
+          status: 'in_progress',
+          components: {},
+          all_accepted: true,  // Attacker sets flag without any components
+          accepted_count: 0,
+          total_count: 0,
+        },
+      },
+    });
+    const proposed = makeState({
+      current_phase: 'finalization',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+        components: {
+          status: 'in_progress',
+          components: {},
+          all_accepted: true,
+        },
+        finalization: { status: 'in_progress' },
+      },
+    });
+    const result = runValidatorLocal(current, proposed);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('All components must be accepted');
+  });
+
+  it('blocks finalization when all_accepted is true but some components are pending', () => {
+    const current = makeState({
+      current_phase: 'components',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+        components: {
+          status: 'in_progress',
+          components: {
+            auth: { status: 'accepted' },
+            api: { status: 'pending' },
+          },
+          all_accepted: true,  // Flag says true, but api is pending
+        },
+      },
+    });
+    const proposed = makeState({
+      current_phase: 'finalization',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+        components: {
+          status: 'in_progress',
+          components: {
+            auth: { status: 'accepted' },
+            api: { status: 'pending' },
+          },
+          all_accepted: true,
+        },
+        finalization: { status: 'in_progress' },
+      },
+    });
+    const result = runValidatorLocal(current, proposed);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('All components must be accepted');
+  });
+
+  it('allows finalization when all components are genuinely accepted', () => {
+    const current = makeState({
+      current_phase: 'components',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+        components: {
+          status: 'in_progress',
+          components: {
+            auth: { status: 'accepted' },
+            api: { status: 'accepted' },
+          },
+          all_accepted: true,
+        },
+      },
+    });
+    const proposed = makeState({
+      current_phase: 'finalization',
+      phases: {
+        evaluation: { accepted: true },
+        methodology: { accepted: true, pattern_accepted: true, components_overview_accepted: true, cross_cutting_accepted: true },
+        components: {
+          status: 'in_progress',
+          components: {
+            auth: { status: 'accepted' },
+            api: { status: 'accepted' },
+          },
+          all_accepted: true,
+        },
+        finalization: { status: 'in_progress' },
+      },
+    });
+    const result = runValidatorLocal(current, proposed);
+    expect(result.exitCode).toBe(0);
+  });
+});
+
+describe('Security: Schema type validation (Fix 6)', () => {
+  it('rejects current_phase as number', () => {
+    const result = runValidatorLocal(null, {
+      project_name: 'test',
+      current_phase: 42,
+      phases: {
+        evaluation: {}, methodology: {}, components: {}, finalization: {},
+      },
+      decision_count: 0,
+    });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('must be a string');
+  });
+
+  it('rejects phases as string', () => {
+    const result = runValidatorLocal(null, {
+      project_name: 'test',
+      current_phase: 'not_started',
+      phases: 'invalid',
+      decision_count: 0,
+    });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('must be an object');
+  });
+
+  it('rejects decision_count as string', () => {
+    const result = runValidatorLocal(null, {
+      project_name: 'test',
+      current_phase: 'not_started',
+      phases: {
+        evaluation: {}, methodology: {}, components: {}, finalization: {},
+      },
+      decision_count: 'many',
+    });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('must be a number');
+  });
+
+  it('rejects phase value as non-object', () => {
+    const result = runValidatorLocal(null, {
+      project_name: 'test',
+      current_phase: 'not_started',
+      phases: {
+        evaluation: 'invalid', methodology: {}, components: {}, finalization: {},
+      },
+      decision_count: 0,
+    });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('must be an object');
+  });
+});

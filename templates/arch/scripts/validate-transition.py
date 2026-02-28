@@ -20,6 +20,14 @@ LEGAL_TRANSITIONS = {
     "finalization": []
 }
 
+def _check_all_components_accepted(state):
+    """Dynamically verify all components are accepted instead of trusting a flag."""
+    components = state.get("phases", {}).get("components", {}).get("components", {})
+    if not components:
+        return False
+    return all(c.get("status") == "accepted" for c in components.values())
+
+
 PREREQUISITES = {
     "methodology": {
         "check": lambda old: old["phases"]["evaluation"]["accepted"],
@@ -35,7 +43,7 @@ PREREQUISITES = {
         "message": "BLOCKED: Phase 2 — pattern, component overview, AND cross-cutting decisions must all be accepted."
     },
     "finalization": {
-        "check": lambda old: old["phases"]["components"]["all_accepted"],
+        "check": lambda old: _check_all_components_accepted(old),
         "message": "BLOCKED: All components must be accepted before Finalization."
     }
 }
@@ -50,6 +58,7 @@ VALID_COMPONENT_TRANSITIONS = {
 
 REQUIRED_KEYS = ["project_name", "current_phase", "phases", "decision_count"]
 REQUIRED_PHASES = ["evaluation", "methodology", "components", "finalization"]
+VALID_PHASES = {"not_started", "evaluation", "methodology", "components", "finalization"}
 
 
 def load_current_state():
@@ -66,20 +75,32 @@ def backup_state():
         backup_path = STATE_FILE + ".bak"
         try:
             shutil.copy2(STATE_FILE, backup_path)
-        except Exception:
-            pass  # Best effort — don't block on backup failure
+        except Exception as e:
+            print(f"WARNING: State backup failed: {e}", file=sys.stderr)
 
 
 def validate_schema(state):
-    """Validate that state.json has the required structure."""
+    """Validate that state.json has the required structure and types."""
     for key in REQUIRED_KEYS:
         if key not in state:
             return False, f"BLOCKED: state.json missing required key: '{key}'"
+
+    # Type checks
+    if not isinstance(state.get("current_phase"), str):
+        return False, "BLOCKED: 'current_phase' must be a string."
+    if not isinstance(state.get("phases"), dict):
+        return False, "BLOCKED: 'phases' must be an object."
+    if not isinstance(state.get("decision_count"), (int, float)):
+        return False, "BLOCKED: 'decision_count' must be a number."
+    if not isinstance(state.get("project_name"), str):
+        return False, "BLOCKED: 'project_name' must be a string."
 
     phases = state.get("phases", {})
     for phase_name in REQUIRED_PHASES:
         if phase_name not in phases:
             return False, f"BLOCKED: state.json missing required phase: '{phase_name}'"
+        if not isinstance(phases[phase_name], dict):
+            return False, f"BLOCKED: Phase '{phase_name}' must be an object."
 
     return True, ""
 
@@ -89,11 +110,16 @@ def validate_phase_transition(old_state, new_state):
     old_phase = old_state["current_phase"]
     new_phase = new_state["current_phase"]
 
+    if old_phase not in VALID_PHASES:
+        return False, f"BLOCKED: Current phase '{old_phase}' is not a recognized phase."
+    if new_phase not in VALID_PHASES:
+        return False, f"BLOCKED: Target phase '{new_phase}' is not a recognized phase."
+
     if old_phase == new_phase:
         return True, ""
 
-    old_idx = phase_order.index(old_phase) if old_phase in phase_order else -1
-    new_idx = phase_order.index(new_phase) if new_phase in phase_order else -1
+    old_idx = phase_order.index(old_phase)
+    new_idx = phase_order.index(new_phase)
 
     # Backward transitions are handled by validate_no_backward_phase
     if new_idx < old_idx:
@@ -122,8 +148,11 @@ def validate_no_backward_phase(old_state, new_state):
     old_phase = old_state["current_phase"]
     new_phase = new_state["current_phase"]
 
-    old_idx = phase_order.index(old_phase) if old_phase in phase_order else -1
-    new_idx = phase_order.index(new_phase) if new_phase in phase_order else -1
+    if old_phase not in VALID_PHASES or new_phase not in VALID_PHASES:
+        return False, f"BLOCKED: Unrecognized phase in transition '{old_phase}' → '{new_phase}'."
+
+    old_idx = phase_order.index(old_phase)
+    new_idx = phase_order.index(new_phase)
 
     if new_idx < old_idx:
         # Allow backward transition ONLY during a reopen
@@ -134,7 +163,7 @@ def validate_no_backward_phase(old_state, new_state):
 
         if new_count > old_count:
             # This is a reopen operation — check limits
-            max_reopens = new_reopens.get("max", 2)
+            max_reopens = old_reopens.get("max", 2)
             if new_count > max_reopens:
                 return False, (
                     f"BLOCKED: Maximum reopens exceeded ({new_count} > {max_reopens})."
@@ -225,7 +254,7 @@ def block(message):
 
 def main():
     try:
-        proposed_content = sys.stdin.read().strip()
+        proposed_content = sys.stdin.read(1_048_576).strip()  # 1MB limit
         if not proposed_content:
             block("BLOCKED: Empty state data provided.")
         new_state = json.loads(proposed_content)

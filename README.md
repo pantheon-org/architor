@@ -42,6 +42,21 @@ npx arch-agent reset
 
 **Requirements:** Node.js 18+, Claude Code, Python 3, git
 
+## Import Existing Architecture
+
+Have an existing architecture document? Import it for review and iteration:
+
+```bash
+npx arch-agent import path/to/architecture.md --name "My Project"
+```
+
+Then in Claude Code:
+```
+/import-architecture
+```
+
+The agent parses your document and walks through each phase, extracting and reviewing requirements, pattern, components, and cross-cutting decisions. Quickly `/accept` phases that look good, or `/refine` those that need updates. Imported projects get 5 reopens (vs 2) for more iteration room.
+
 ## The Four Phases
 
 ```
@@ -63,6 +78,7 @@ Each phase has a gate. You must explicitly ACCEPT before proceeding.
 | `/propose-methodology` | Phase 2: Architecture pattern (2A), components (2B), cross-cutting (2C) |
 | `/design-component [name]` | Phase 3: Detailed component design |
 | `/generate-docs` | Phase 4: Validate and generate architecture document |
+| `/import-architecture` | Import and review existing architecture document |
 | `/accept` | Accept current proposal |
 | `/refine [feedback]` | Request changes |
 | `/alternative [request]` | Request different approach |
@@ -110,7 +126,7 @@ your-project/
 │   └── reviews/                # Adversarial review findings
 ├── .claude/
 │   ├── settings.json           # Hook configuration
-│   ├── commands/               # 12 slash commands
+│   ├── commands/               # 13 slash commands
 │   └── skills/                 # 4 auto-activating skills
 └── output/
     └── architecture-document.md  # Phase 4 final deliverable

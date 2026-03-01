@@ -4,6 +4,7 @@ const { version } = require('../package.json');
 const { runInit } = require('./init');
 const { runVerify } = require('./verify');
 const { runReset } = require('./reset');
+const { runImport } = require('./import');
 
 function run(argv) {
   const program = new Command();
@@ -19,6 +20,13 @@ function run(argv) {
     .option('--name <name>', 'Set project name in state.json')
     .option('--force', 'Overwrite existing files without prompting')
     .action((options) => runInit(process.cwd(), options));
+
+  program
+    .command('import <source>')
+    .description('Import existing architecture document and scaffold for review')
+    .option('--name <name>', 'Set project name in state.json')
+    .option('--force', 'Overwrite existing files without prompting')
+    .action((source, options) => runImport(process.cwd(), source, options));
 
   program
     .command('verify')

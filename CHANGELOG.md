@@ -2,6 +2,29 @@
 
 All notable changes to Architor are documented here.
 
+## [2.1.0] — 2026-03-02
+
+### Import Existing Architecture
+
+New feature: import and iteratively review existing architecture documents.
+
+**CLI**
+- New `arch-agent import <source>` command — scaffolds project and imports existing architecture document
+- Supports `--name` and `--force` options (same as `init`)
+- Sets `reopens.max: 5` for imported projects (more iteration room)
+- Adds `import_source` metadata field to state.json
+
+**Slash Command**
+- New `/import-architecture` — fast-track review flow for imported documents
+- Parses existing document into phases (requirements, pattern, components, cross-cutting, component designs)
+- Each phase gets adversarial review with standard acceptance gates
+- Uses normal state machine transitions — zero validator changes needed
+
+**Tests**
+- 9 new import tests + 2 CLI tests (51 total)
+
+---
+
 ## [2.0.2] — 2026-03-01
 
 ### Package metadata fix

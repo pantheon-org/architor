@@ -59,6 +59,57 @@ claude
 
 Type `/help` to see all available commands.
 
+## Importing an Existing Architecture
+
+If you already have an architecture document and want to iterate on it rather than starting from scratch:
+
+### 1. Import your document
+
+```bash
+cd your-project
+npx arch-agent import path/to/your-architecture.md --name "My Project"
+```
+
+This scaffolds the project (same as `init`) and copies your document to `.arch/existing-architecture.md`. Imported projects get 5 reopens (vs 2) for more iteration room.
+
+### 2. Start the review
+
+```bash
+claude
+```
+
+Type `/import-architecture`. The agent will:
+- Parse your document into sections
+- Present each section for adversarial review
+- Progress through all 4 phases using the extracted content
+
+### 3. Review each phase
+
+The agent presents extracted content from your document. For each phase:
+- **Accept** (`/accept`) phases that look correct
+- **Refine** (`/refine [feedback]`) phases that need changes
+- **Challenge** — push back on decisions that seem outdated
+
+### Example
+
+```
+$ npx arch-agent import docs/architecture-v2.md --name "Payment Platform v3"
+$ claude
+
+You: /import-architecture
+Agent: [parses document, presents Phase 1 evaluation of extracted requirements]
+Agent: "Your document lists 12 functional requirements. I found 3 critical gaps: ..."
+You: /accept
+Agent: [presents Phase 2A — reviews extracted microservices pattern]
+Agent: "Your document chose microservices for a 6-person team. Have you considered..."
+You: /refine We've grown to 15 engineers since this was written
+Agent: [updates pattern analysis with new team context]
+You: /accept
+[... continues through all phases ...]
+```
+
+---
+
 ## The Four Phases
 
 ### Phase 1: Evaluate Your PRD

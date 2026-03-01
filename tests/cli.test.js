@@ -42,4 +42,16 @@ describe('CLI', () => {
     expect(result.stdout).toContain('--name');
     expect(result.stdout).toContain('--force');
   });
+
+  it('shows import command in help', () => {
+    const result = runCli();
+    expect(result.stdout).toContain('import');
+  });
+
+  it('shows help for import command', () => {
+    const result = runCli('import --help');
+    expect(result.stdout).toContain('--name');
+    expect(result.stdout).toContain('--force');
+    expect(result.stdout).toContain('source');
+  });
 });

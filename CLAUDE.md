@@ -63,6 +63,7 @@ Every decision appended to `.arch/decisions.md`:
 - `/decision-log` — Show all decisions
 - `/review-component [name]` — Launch adversarial review subagent
 - `/generate-docs` — Phase 4: Generate final architecture document
+- `/import-architecture` — Import and review an existing architecture document (must be at `not_started` phase)
 - `/help` — Show available commands and current phase guidance
 
 ## Security Constraints — ENFORCED BY HOOKS

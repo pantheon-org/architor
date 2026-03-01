@@ -68,7 +68,20 @@ Every decision appended to `.arch/decisions.md`:
 - `/decision-log` — Show all decisions
 - `/review-component [name]` — Launch adversarial review subagent
 - `/generate-docs` — Phase 4: Validate and generate final architecture document
+- `/import-architecture` — Import and review an existing architecture document (must be at `not_started` phase)
 - `/help` — Show available commands and current phase guidance
+
+## Import Mode
+
+When `import_source` is set in `.arch/state.json`, the project was initialized via `arch-agent import`. The `/import-architecture` command reads the existing document from `.arch/existing-architecture.md` and guides a fast-track review:
+
+- Each phase presents **extracted content** from the imported document instead of generating from scratch
+- The adversarial review still applies — flag gaps, outdated tech, missing NFRs
+- All normal phase gates and acceptance rules still apply
+- Imported projects get `reopens.max: 5` (vs default 2) for more iteration room
+- Prefix extracted content with "From your existing document:" for clarity
+
+The import flow uses the standard phase machine: not_started -> evaluation -> methodology -> components -> finalization. No special bypass exists.
 
 ## Security Constraints — ENFORCED BY HOOKS
 
@@ -102,4 +115,5 @@ When recommending technologies:
 | `.arch/phase2-cross-cutting.md` | Phase 2C cross-cutting decisions |
 | `.arch/components/*.md` | Phase 3 detailed component designs |
 | `.arch/reviews/*.md` | Subagent review findings |
+| `.arch/existing-architecture.md` | Imported architecture document (created by `arch-agent import`) |
 | `output/architecture-document.md` | Phase 4 final deliverable |

@@ -10,6 +10,7 @@ WORKFLOW COMMANDS:
   /propose-methodology    Phase 2: Architecture pattern (2A), components (2B), cross-cutting (2C)
   /design-component [n]   Phase 3: Design a specific component in detail
   /generate-docs          Phase 4: Validate and generate final architecture document
+  /import-architecture    Import and review existing architecture document
 
 DECISION COMMANDS:
   /accept                 Accept current proposal (phase, sub-phase, or component)
@@ -28,7 +29,7 @@ SETUP:
 
 Then based on current phase, show contextual guidance:
 
-**If not_started:** "Start by placing your PRD in `.arch/prd.md` and optionally filling out `.arch/org-context.md`. Then run `/analyze-prd`. If org-context is empty, the agent will interview you."
+**If not_started:** "Start by placing your PRD in `.arch/prd.md` and optionally filling out `.arch/org-context.md`. Then run `/analyze-prd`. If org-context is empty, the agent will interview you. If you have an existing architecture document, run `arch-agent import <file>` from CLI first, then use `/import-architecture`."
 
 **If evaluation:** "You're in Phase 1. Review the PRD analysis and either `/accept`, `/refine`, or provide answers to gap questions."
 

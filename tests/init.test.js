@@ -59,6 +59,7 @@ describe('init', () => {
     expect(state.reopens).toBeDefined();
     expect(state.reopens.count).toBe(0);
     expect(state.reopens.max).toBe(2);
+    expect(state.import_source).toBeNull();
   });
 
   it('sets project name with --name option', async () => {

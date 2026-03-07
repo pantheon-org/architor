@@ -18,83 +18,198 @@ Architecture decisions are the most expensive to reverse. Yet most teams either:
 
 arch-agent solves this by combining AI reasoning with human-controlled gates. The AI proposes and challenges. You decide. Every decision is logged with rationale, alternatives, and trade-offs.
 
-## What Goes In, What Comes Out
+## Where arch-agent Fits
 
 ```mermaid
 flowchart LR
     subgraph Input
-        PRD["PRD\n(requirements)"]
-        CTX["Org Context\n(team, stack, constraints)"]
+        PRD[".arch/prd.md\n(requirements)"]
+        CTX[".arch/org-context.md\n(team, stack, constraints)"]
     end
 
-    subgraph Process["arch-agent + Claude Code"]
-        P1["Phase 1: Evaluate"]
-        P2["Phase 2: Decide"]
-        P3["Phase 3: Design"]
-        P4["Phase 4: Document"]
+    subgraph arch-agent["arch-agent + Claude Code"]
+        direction TB
+        P1["Phase 1\nEvaluate PRD"]
+        P2["Phase 2\nDecide Architecture"]
+        P3["Phase 3\nDesign Components"]
+        P4["Phase 4\nValidate & Document"]
         P1 --> P2 --> P3 --> P4
     end
 
-    subgraph Output
-        DL["Decision Log"]
-        CS["Component Specs"]
-        AD["Architecture Document"]
+    subgraph Artifacts["Generated Artifacts"]
+        DL[".arch/decisions.md"]
+        CS[".arch/components/*.md"]
+        RV[".arch/reviews/*.md"]
+        AD["output/\narchitecture-document.md"]
     end
 
     PRD --> P1
     CTX --> P1
     P4 --> DL
     P4 --> CS
+    P4 --> RV
     P4 --> AD
 ```
 
-**Input:** Your PRD and organizational context (team size, tech stack, constraints).
+**Input:** Your PRD and organizational context (team size, tech stack, constraints), placed in the `.arch/` directory.
 
-**Output:** A decision log, detailed component specs, and a comprehensive architecture document — every choice backed by rationale and alternatives.
+**Output:** A decision log, detailed component specs, adversarial review findings, and a comprehensive architecture document — every choice backed by rationale and alternatives. Artifacts are produced throughout the phases, not only at the end.
 
-## How the Process Works
+## End-to-End Workflow
 
-arch-agent enforces a four-phase workflow. Each phase has a gate — you must explicitly `/accept` before proceeding. The agent cannot skip phases or auto-accept. This is enforced by Python validation hooks at the file system level, not by prompt instructions.
+Here is the complete journey from requirements to architecture output:
+
+**1. Scaffold the project**
+
+```bash
+npx arch-agent init --name "My Project"
+```
+
+This creates `.arch/` (state machine, validation scripts, working files), `.claude/` (slash commands, skills, hook configuration), and `CLAUDE.md` (agent identity and rules).
+
+**2. Provide your requirements**
+
+Write or paste your Product Requirements Document into `.arch/prd.md`. Optionally describe your team size, tech stack, and constraints in `.arch/org-context.md`. If you skip org-context, the agent interviews you during Phase 1 (15 questions across scale, team, and constraints).
+
+**3. Start Claude Code and run the architecture process**
+
+```bash
+claude
+```
+
+Then type `/analyze-prd` to begin. The agent walks you through four phases:
+
+| Phase | What Happens | Command | Artifact Produced |
+|-------|-------------|---------|-------------------|
+| **1. Evaluate** | Analyzes your PRD, extracts requirements, finds gaps, assesses risks | `/analyze-prd` | `.arch/phase1-evaluation.md` |
+| **2A. Pattern** | Proposes architecture pattern with rationale and alternatives | `/propose-methodology` | `.arch/phase2-methodology.md` |
+| **2B. Components** | Maps all system components, dependencies, and integration points | `/propose-methodology` | `.arch/phase2-components-overview.md` |
+| **2C. Cross-Cutting** | Locks auth, observability, deployment, error handling, data management | `/propose-methodology` | `.arch/phase2-cross-cutting.md` |
+| **3. Design** | Details each component: technology + version, API contracts, failure modes | `/design-component [name]` | `.arch/components/[name].md` |
+| **4. Document** | Validates end-to-end consistency, builds risk register, generates final doc | `/generate-docs` | `output/architecture-document.md` |
+
+**4. Review and accept at each gate**
+
+At every phase boundary, the agent presents its proposal. You review it and:
+- `/accept` — Confirm the proposal and advance to the next phase
+- `/refine [feedback]` — Request specific changes while staying in the current phase
+- `/alternative [request]` — Request a completely different approach
+
+The agent cannot skip phases or auto-accept. This is enforced by Python validation hooks at the file system level, not by prompt instructions.
+
+**5. Collect your architecture**
+
+When complete, your project contains a full set of architecture artifacts: evaluated requirements, accepted decisions with rationale, detailed component designs, and a comprehensive architecture document in `output/architecture-document.md`.
+
+## How Artifacts Evolve Across Phases
+
+Architecture knowledge builds incrementally. Each phase produces artifacts that feed into the next:
 
 ```mermaid
 flowchart TD
-    START(["Start"]) --> P1
-
-    subgraph P1["Phase 1: Evaluate PRD"]
-        P1A["Analyze requirements\nFind gaps & risks\nAsk hard questions"]
+    subgraph Phase1["Phase 1: Evaluate"]
+        E1["Extracted requirements (FR-001, FR-002...)"]
+        E2["Identified gaps & risks"]
+        E3["phase1-evaluation.md"]
     end
 
-    P1 -->|"/accept"| P2A
-
-    subgraph P2["Phase 2: Decide"]
-        P2A["2A: Architecture Pattern\nPropose pattern + alternatives"]
-        P2A -->|"/accept"| P2B["2B: Component Map\nMap system boundaries"]
-        P2B -->|"/accept"| P2C["2C: Cross-Cutting\nLock auth, observability,\ndeployment, error handling"]
+    subgraph Phase2["Phase 2: Decide"]
+        D1["Architecture pattern + rationale"]
+        D2["Component map with dependencies"]
+        D3["Cross-cutting constraints\n(auth, observability, deployment,\nerror handling, data management)"]
     end
 
-    P2C -->|"/accept"| P3
-
-    subgraph P3["Phase 3: Design Components"]
-        P3A["Design one component at a time\nTechnology + version, API contracts,\nfailure modes, scaling strategy\nAdversarial review"]
+    subgraph Phase3["Phase 3: Design"]
+        C1["Component spec: technology + version"]
+        C2["API contracts & integration points"]
+        C3["Failure modes & scaling strategy"]
+        C4["Cross-cutting compliance check"]
     end
 
-    P3 -->|"/accept each"| P4
-
-    subgraph P4["Phase 4: Validate & Document"]
-        P4A["End-to-end simulation\nRisk register\nArchitecture document"]
+    subgraph Phase4["Phase 4: Document"]
+        F1["End-to-end validation"]
+        F2["Risk register"]
+        F3["architecture-document.md"]
     end
 
-    P4 -->|"/accept"| DONE(["Architecture Complete"])
+    Phase1 -->|"requirements inform\npattern selection"| Phase2
+    Phase2 -->|"cross-cutting decisions\nconstrain every component"| Phase3
+    Phase3 -->|"all components accepted\ntriggers validation"| Phase4
+
+    DL["decisions.md\n(updated every phase)"] -.-> Phase1
+    DL -.-> Phase2
+    DL -.-> Phase3
+    DL -.-> Phase4
 ```
 
-At every gate, you can:
-- `/accept` — Confirm the proposal and advance
-- `/refine [feedback]` — Request specific changes
-- `/alternative [request]` — Request a different approach
+Every decision is logged to `.arch/decisions.md` as it happens — not retroactively. By Phase 4, the decision log contains the complete rationale trail for every architectural choice.
 
-## Example: What the Output Looks Like
+## Example: Designing an E-Commerce Platform
 
-**Decision log entry:**
+A team of 6 engineers is building an e-commerce platform. Here's the full journey:
+
+**Input:** The team writes a PRD describing product catalog, shopping cart, checkout, payments, and order management. They note their constraints in org-context: 6 engineers, existing PostgreSQL expertise, 12-month runway, no Kubernetes experience.
+
+```bash
+npx arch-agent init --name "ShopFlow"
+# Team writes PRD in .arch/prd.md and org-context in .arch/org-context.md
+claude
+```
+
+**Phase 1 — Evaluate:**
+```
+/analyze-prd
+```
+The agent extracts 14 functional requirements and flags 4 critical gaps: no mention of inventory consistency model, missing payment failure recovery strategy, undefined latency SLA, and no data retention policy. The team answers the agent's questions, refines the analysis, and accepts.
+
+*Artifact produced: `.arch/phase1-evaluation.md`*
+
+**Phase 2 — Decide:**
+```
+/propose-methodology
+```
+- **2A:** Agent proposes modular monolith — team of 6 with no Kubernetes experience shouldn't operate microservices. Compares against microservices (rejected: operational burden) and serverless (rejected: cold start on checkout). Team accepts.
+- **2B:** Agent maps 6 components: API Gateway, Product Catalog, Shopping Cart, Checkout & Payments, Order Management, Notification Service. Shows dependency graph. Team accepts.
+- **2C:** Agent locks cross-cutting: JWT auth with RS256, structured JSON logging via Pino, Docker Compose deployment (no K8s), exponential backoff retries, PostgreSQL per-module schemas with eventual consistency for cart-to-order transition. Team accepts.
+
+*Artifacts produced: `.arch/phase2-methodology.md`, `.arch/phase2-components-overview.md`, `.arch/phase2-cross-cutting.md`*
+*Decisions logged: DEC-001 through DEC-009 in `.arch/decisions.md`*
+
+**Phase 3 — Design:**
+```
+/design-component product-catalog
+```
+The agent designs each component one at a time. For Product Catalog: PostgreSQL 16 with full-text search, REST API with pagination, Redis 7 cache for hot products, failure mode if Redis is down (fall through to DB). The agent checks compliance against Phase 2C cross-cutting decisions. Team accepts. Agent advances to Shopping Cart, then Checkout & Payments, and so on.
+
+*Artifacts produced: `.arch/components/product-catalog.md`, `.arch/components/shopping-cart.md`, etc.*
+*Decisions logged: DEC-010 through DEC-021*
+
+**Phase 4 — Validate & Document:**
+```
+/generate-docs
+```
+The agent traces 3 critical user journeys (browse-to-purchase, payment failure recovery, order cancellation) through all components, verifying integration points. Builds a risk register scoring 8 identified risks by probability and impact. Generates the final architecture document.
+
+*Artifact produced: `output/architecture-document.md`*
+
+**Result:** A complete architecture with 21 logged decisions, 6 detailed component specs, and a comprehensive document — ready for implementation, onboarding, or audit.
+
+## Generated Artifacts
+
+arch-agent produces architecture artifacts throughout the process, not just at the end:
+
+| Artifact | Location | When Produced | Contents |
+|----------|----------|---------------|----------|
+| **Decision log** | `.arch/decisions.md` | Every phase | Each decision with ID, rationale, alternatives, trade-offs, and risk |
+| **PRD evaluation** | `.arch/phase1-evaluation.md` | Phase 1 | Extracted requirements, gaps rated by severity, risk assessment |
+| **Architecture pattern** | `.arch/phase2-methodology.md` | Phase 2A | Chosen pattern, rationale, alternatives compared |
+| **Component map** | `.arch/phase2-components-overview.md` | Phase 2B | All components, dependencies, integration points |
+| **Cross-cutting decisions** | `.arch/phase2-cross-cutting.md` | Phase 2C | Auth, observability, deployment, error handling, data strategies |
+| **Component designs** | `.arch/components/[name].md` | Phase 3 | Technology + version, API contracts, failure modes, scaling |
+| **Review findings** | `.arch/reviews/[name].md` | Phase 3 (optional) | Adversarial review results from `/review-component` |
+| **Architecture document** | `output/architecture-document.md` | Phase 4 | Comprehensive deliverable consolidating all decisions |
+
+**Example decision log entry:**
 ```
 ### [DEC-003] Phase 2A | Architecture Pattern
 - Decision: Modular monolith with event-driven boundaries
@@ -104,7 +219,7 @@ At every gate, you can:
 - Risk: Module boundaries may need extraction to services at 10x scale
 ```
 
-**Component design (abbreviated):**
+**Example component design (abbreviated):**
 ```
 ## Auth Service — Component Design
 
@@ -127,12 +242,16 @@ Cross-Cutting Compliance:
   Deployment: Helm chart, horizontal pod autoscaler
 ```
 
-## Who Is This For
+## When to Use arch-agent
 
-- **Tech leads** starting a new project who want structured design, not a blank whiteboard
-- **Architects** who want AI assistance with human control over every decision
-- **Teams** that need documented architecture decisions for compliance, onboarding, or audit
-- **Solo developers** building complex systems who want an adversarial reviewer to catch blind spots
+| Scenario | How arch-agent Helps |
+|----------|---------------------|
+| **Starting a new project from a PRD** | Evaluates your requirements, finds gaps, proposes an architecture, and designs every component — with rationale for each choice |
+| **Structured architecture governance** | Enforces phase gates, decision logging, and explicit acceptance — every decision has a paper trail |
+| **Documented architecture decisions** | Produces a complete decision log for compliance, onboarding, or audit — not tribal knowledge in someone's head |
+| **Reviewing an existing architecture** | Import your document with `arch-agent import`, and the agent walks through each phase challenging what exists |
+| **AI-assisted design with human control** | The AI proposes and challenges; you decide at every gate. No auto-acceptance, no skipped phases |
+| **Onboarding engineers to a system** | The generated architecture document and decision log explain not just what was decided, but why — with alternatives considered and risks documented |
 
 ## Quick Start
 
@@ -146,8 +265,6 @@ Then:
 1. Write your requirements in `.arch/prd.md`
 2. Optionally describe your team and constraints in `.arch/org-context.md`
 3. Start Claude Code and type `/analyze-prd`
-
-The agent walks you through all four phases. At each gate, review the proposal and `/accept`, `/refine`, or `/alternative`.
 
 ### Existing architecture
 
@@ -204,8 +321,6 @@ flowchart LR
 
 Decisions are **immutable once accepted** — unless you spend one of your limited reopens (max 2 per project). Reopening cascades: changing an early decision un-accepts everything downstream.
 
-This prevents both design thrashing and premature lock-in.
-
 ## Key Design Decisions
 
 **Hard enforcement, not prompt instructions.** Python validation hooks block illegal state transitions at the file system level. Phase skipping, backward transitions, and component injection are blocked regardless of what the AI is asked to do.
@@ -215,40 +330,6 @@ This prevents both design thrashing and premature lock-in.
 **One component at a time.** Phase 3 designs components sequentially in dependency order. Each component is reviewed against previously accepted components for integration consistency. No parallel design that leads to interface mismatches.
 
 **Controlled iteration.** The `/reopen` command allows going back to fix decisions with cascading invalidation. Reopening Phase 2A un-accepts 2B, 2C, and marks all components as "needs-review". Limited to 2 reopens per project to prevent design thrashing.
-
-## Example Scenario
-
-A team of 8 engineers is building a payment platform. Here's how arch-agent guides the process:
-
-```
-$ npx arch-agent init --name "Payment Platform"
-# Add PRD to .arch/prd.md, then start Claude Code
-
-/analyze-prd
-  -> Agent finds 3 critical gaps: no PCI-DSS mention, missing DR strategy,
-     undefined latency SLA. Team answers questions, refines, accepts.
-
-/propose-methodology
-  -> Agent proposes modular monolith (team too small for microservices).
-     Compares against 2 alternatives. Team accepts.
-
-  -> Agent maps 7 components: API Gateway, Payment Engine, Card Vault,
-     Notification Service, Admin Dashboard, Audit Service, Compliance Reporter.
-
-  -> Agent locks cross-cutting: mTLS for internal auth, structured JSON logging,
-     Kubernetes deployment, circuit breakers on external calls, PCI-compliant
-     data isolation for Card Vault.
-
-/design-component api-gateway
-  -> Kong Gateway 3.x, rate limiting, JWT validation, failure modes documented.
-  -> Team accepts. Agent advances to next component.
-  [... continues through all 7 components ...]
-
-/generate-docs
-  -> Agent validates end-to-end, builds risk register, generates architecture doc.
-```
-
-Result: A complete architecture document with 20+ logged decisions, each with rationale and alternatives.
 
 ## Project Structure
 

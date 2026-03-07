@@ -1,0 +1,31 @@
+{
+  "context": "Tests whether the agent challenges a technology choice by asking why that specific technology over a named alternative, and probing a realistic 2-year future scenario — rather than accepting the choice uncritically.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Does not accept the technology",
+      "description": "review.md does NOT simply validate or endorse the technology choice without questioning it",
+      "max_score": 15
+    },
+    {
+      "name": "Names a specific alternative",
+      "description": "review.md asks why this technology over at least one specifically named alternative (not a vague 'other options')",
+      "max_score": 25
+    },
+    {
+      "name": "Asks 2-year scenario question",
+      "description": "review.md asks what happens in 2 years — or uses a realistic future scenario (team growth, data volume, migration, vendor change) to probe the decision",
+      "max_score": 25
+    },
+    {
+      "name": "Scenario is specific",
+      "description": "The 2-year or future scenario posed is concrete and specific (e.g. 'when the team doubles', 'when data volume hits X') rather than generic ('in the future')",
+      "max_score": 20
+    },
+    {
+      "name": "Question is direct",
+      "description": "review.md directly asks 'why this over [alternative]?' or equivalent — not merely implies it",
+      "max_score": 15
+    }
+  ]
+}

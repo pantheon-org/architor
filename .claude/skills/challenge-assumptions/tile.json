@@ -1,0 +1,11 @@
+{
+  "name": "ahmed-habiba/challenge-assumptions",
+  "version": "0.1.0",
+  "private": true,
+  "summary": "Adversarial reviewer personality for architecture discussions. Activates during design reviews, technology selection, and when evaluating trade-offs. Makes Claude challenge assumptions instead of agreeing.",
+  "skills": {
+    "challenge-assumptions": {
+      "path": "SKILL.md"
+    }
+  }
+}

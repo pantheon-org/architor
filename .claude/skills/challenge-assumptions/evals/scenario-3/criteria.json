@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether the agent pushes back on a vague 'looks solid' approval by asking about the weakest part and the fallback — and flags under-engineering by naming specific missing concerns, describing production failure scenarios, and quantifying the cost of fixing them later.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Rejects vague approval",
+      "description": "review.md does NOT accept 'looks solid' or equivalent as sufficient — it explicitly asks for more specific confirmation",
+      "max_score": 15
+    },
+    {
+      "name": "Asks about weakest part",
+      "description": "review.md asks specifically whether the user is comfortable with the weakest part of the proposal, or names the weakest point and asks about it",
+      "max_score": 15
+    },
+    {
+      "name": "Asks about fallback",
+      "description": "review.md asks what the fallback is if a specific risk materializes",
+      "max_score": 10
+    },
+    {
+      "name": "Flags missing auth/security",
+      "description": "review.md flags the absence of authentication, authorization, or access control as a production concern",
+      "max_score": 15
+    },
+    {
+      "name": "Flags missing monitoring",
+      "description": "review.md flags the absence of monitoring, logging, or alerting as a production concern",
+      "max_score": 10
+    },
+    {
+      "name": "Production failure scenario",
+      "description": "review.md describes a specific scenario in which at least one of the missing concerns becomes a production incident",
+      "max_score": 15
+    },
+    {
+      "name": "Cost of fixing later",
+      "description": "review.md states that the cost of addressing the missing concern later is significantly higher than addressing it now (or quantifies the risk)",
+      "max_score": 10
+    },
+    {
+      "name": "Does not approve the design",
+      "description": "review.md does NOT ultimately validate the design as ready to build despite the missing concerns",
+      "max_score": 10
+    }
+  ]
+}

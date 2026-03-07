@@ -1,0 +1,36 @@
+{
+  "context": "Tests whether the agent maintains high tension during a Phase 2 deep-dive architecture review — challenging scalability assumptions, identifying single points of failure, probing technology dependencies, and asking specific hard questions rather than producing a superficial summary.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Challenges scalability assumption",
+      "description": "review.md explicitly challenges at least one scalability assumption in the document — e.g. questions whether a stated capacity claim is backed by evidence or testing",
+      "max_score": 20
+    },
+    {
+      "name": "Identifies single point of failure",
+      "description": "review.md identifies at least one single point of failure in the proposed architecture",
+      "max_score": 20
+    },
+    {
+      "name": "Challenges a dependency",
+      "description": "review.md challenges at least one dependency in the design by asking what happens if it fails, is unavailable, or changes its API/contract",
+      "max_score": 15
+    },
+    {
+      "name": "Technology choice challenged",
+      "description": "review.md challenges at least one technology choice by naming a specific concern or alternative",
+      "max_score": 15
+    },
+    {
+      "name": "Specific probing questions",
+      "description": "review.md asks at least 2 specific, answerable questions — not general observations like 'consider security' but targeted questions like 'what is your RTO if the cache layer fails?'",
+      "max_score": 15
+    },
+    {
+      "name": "Does not approve overall",
+      "description": "review.md does NOT conclude that the architecture is sound or ready without unresolved concerns",
+      "max_score": 15
+    }
+  ]
+}

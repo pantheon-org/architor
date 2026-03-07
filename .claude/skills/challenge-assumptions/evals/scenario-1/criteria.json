@@ -1,0 +1,31 @@
+{
+  "context": "Tests whether the agent refuses to accept vague requirements like 'highly available' without quantification, asks for specific numbers, and specifically probes the 99.9% vs 99.99% distinction for availability — rather than filling in assumptions and proceeding.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Does not assume availability target",
+      "description": "review.md does NOT assume or define what 'highly available' means and proceed — it asks the question instead",
+      "max_score": 20
+    },
+    {
+      "name": "Asks for specific availability number",
+      "description": "review.md asks for a specific availability percentage, SLA, or uptime target rather than accepting 'highly available' as sufficient",
+      "max_score": 20
+    },
+    {
+      "name": "99.9% vs 99.99% distinction",
+      "description": "review.md references the difference between 99.9% and 99.99% uptime (or the equivalent downtime hours: 8.7 hours vs 52 minutes per year)",
+      "max_score": 25
+    },
+    {
+      "name": "Does not assume performance target",
+      "description": "review.md does NOT assume what 'fast enough' or similar vague performance terms mean — it asks for specific numbers (e.g. latency in ms, throughput in RPS)",
+      "max_score": 15
+    },
+    {
+      "name": "No architecture proposed yet",
+      "description": "review.md does NOT propose or begin describing an architecture before the vague requirements are resolved",
+      "max_score": 20
+    }
+  ]
+}

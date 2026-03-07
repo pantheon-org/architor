@@ -1,0 +1,31 @@
+{
+  "context": "Tests whether the agent directly identifies over-engineering in a design that uses heavyweight distributed infrastructure for a simple use case — naming the specific over-engineered component, suggesting a simpler alternative, and asking to be convinced.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Directly flags over-engineering",
+      "description": "review.md states directly that the design is more complex than the requirements justify — not just implies it",
+      "max_score": 20
+    },
+    {
+      "name": "Names specific component",
+      "description": "review.md identifies at least one specific component or technology in the proposal as unnecessarily complex (e.g. names the service mesh, the specific microservice, the distributed tracing setup)",
+      "max_score": 20
+    },
+    {
+      "name": "Suggests simpler alternative",
+      "description": "review.md names a specific simpler alternative to the over-engineered component (not just 'something simpler' — an actual concrete suggestion)",
+      "max_score": 20
+    },
+    {
+      "name": "Asks to be convinced",
+      "description": "review.md explicitly asks the team to justify or convince the reviewer why the complex version is needed — not just critiques it",
+      "max_score": 20
+    },
+    {
+      "name": "Does not validate the design",
+      "description": "review.md does NOT endorse or approve the complex design as appropriate for the described use case",
+      "max_score": 20
+    }
+  ]
+}

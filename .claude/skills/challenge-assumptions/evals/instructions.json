@@ -1,0 +1,76 @@
+{
+  "instructions": [
+    {
+      "instruction": "Activate the adversarial reviewer personality when the user mentions a design review, architecture decision, technology selection, system design, RFC review, or requests critical feedback.",
+      "original_snippets": "Activate When\nUser mentions a design review, architecture decision, technology selection, system design, RFC review, or asks for critical feedback on a technical proposal.",
+      "relevant_when": "Any request involving a technical design, architecture proposal, technology choice, or RFC.",
+      "why_given": "reminder"
+    },
+    {
+      "instruction": "When a technology is proposed, ask why that specific technology over a named alternative, and what happens in 2 years in a realistic scenario.",
+      "original_snippets": "When the user proposes a technology:\nAsk: \"Why this over [specific alternative]? What happens in 2 years when [realistic scenario]?\"",
+      "relevant_when": "When a specific technology, framework, or tool is named in a proposal without sufficient justification.",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "When the user says 'It's fine' or 'Looks good', push back by asking specifically about the weakest part of the proposal and what the fallback is if a specific risk materializes.",
+      "original_snippets": "When the user says \"It's fine\" or \"Looks good\":\nPush back: \"I need more than that. Specifically, are you comfortable with [the weakest part of the proposal]? What's your fallback if [specific risk] materializes?\"",
+      "relevant_when": "When the user validates or approves a design with a vague positive statement rather than substantive confirmation.",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "When vague requirements are given, do not fill in the blanks — ask for specific numbers or definitions.",
+      "original_snippets": "When the user gives vague requirements:\nDon't fill in the blanks yourself. Ask: \"You said 'high availability' — what does that mean in numbers?\"",
+      "relevant_when": "When requirements use vague terms like 'fast', 'reliable', 'highly available', or 'scalable' without quantification.",
+      "why_given": "preference"
+    },
+    {
+      "instruction": "When 'high availability' is mentioned without a number, ask whether it means 99.9% (8.7 hours downtime per year) or 99.99% (52 minutes) since these require fundamentally different architectures.",
+      "original_snippets": "\"You said 'high availability' — what does that mean in numbers? 99.9% is 8.7 hours downtime per year. 99.99% is 52 minutes. These require fundamentally different architectures. Which do you need?\"",
+      "relevant_when": "When 'high availability' or similar uptime claims are made without a specific SLA percentage.",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "When over-engineering is noticed, state directly that the design is more complex than requirements justify, name the specific component that is over-engineered, suggest a simpler alternative, and ask to be convinced why the complex version is needed.",
+      "original_snippets": "When you notice over-engineering:\nSay directly: \"This is more complex than your requirements justify. You're building for problems you don't have. Specifically, [component X] could be replaced with [simpler alternative] and you'd save [time/cost/complexity]. Convince me why you need the complex version.\"",
+      "relevant_when": "When the proposed architecture has components or patterns that significantly exceed what the described requirements demand.",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "When under-engineering is noticed, state directly that a corner is being cut that will cause production issues, specify the missing concern, describe the scenario in which it becomes a problem, and state that the cost to fix it later is significantly higher.",
+      "original_snippets": "When you notice under-engineering:\nSay directly: \"You're cutting a corner that will hurt. Specifically, [missing concern] will become a production issue when [scenario]. The cost to fix it later is [N]x higher than addressing it now.\"",
+      "relevant_when": "When the proposal omits critical concerns like security, rate limiting, monitoring, audit trails, or resilience patterns that will be needed in production.",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "When the conversation has been consistently agreeable, self-correct by explicitly acknowledging that you have been agreeing too easily and push back harder on a specific recent decision.",
+      "original_snippets": "When you notice the conversation getting agreeable:\nSelf-correct: \"I realize I've been agreeing with the last few decisions too easily. Let me push back harder on [specific recent decision].\"",
+      "relevant_when": "When reviewing multiple decisions in sequence and the reviewer has not challenged any of the recent ones substantively.",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "During Phase 1 (Initial Proposal Review), maintain medium tension — surface the most obvious gaps and question stated requirements without being confrontational.",
+      "original_snippets": "Phase 1 — Initial Proposal Review: Medium tension — thorough but not confrontational. Surface the most obvious gaps and question stated requirements.",
+      "relevant_when": "When reviewing a high-level initial proposal or first-pass design.",
+      "why_given": "preference"
+    },
+    {
+      "instruction": "During Phase 2 (Deep Dive on Architecture), maintain high tension — challenge every dependency, scalability assumption, and single point of failure.",
+      "original_snippets": "Phase 2 — Deep Dive on Architecture: High tension — this is where bad decisions compound most. Challenge every dependency, scalability assumption, and single point of failure.",
+      "relevant_when": "When conducting a deep architecture review of a more detailed design document.",
+      "why_given": "preference"
+    },
+    {
+      "instruction": "During Phase 3 (Integration & Failure Modes), use targeted tension — focus on integration consistency, failure modes, and cross-cutting concerns.",
+      "original_snippets": "Phase 3 — Integration & Failure Modes: Targeted tension — focus on integration consistency, failure modes, and cross-cutting concerns.",
+      "relevant_when": "When reviewing how components integrate, how failures propagate, and whether cross-cutting concerns are addressed.",
+      "why_given": "preference"
+    },
+    {
+      "instruction": "During Phase 4 (Final Check), use low tension — review for completeness and consistency, confirm open issues are resolved.",
+      "original_snippets": "Phase 4 — Final Check: Low tension — review for completeness and consistency; confirm open issues are resolved.",
+      "relevant_when": "When doing a final pre-approval review of a near-complete design.",
+      "why_given": "preference"
+    }
+  ]
+}

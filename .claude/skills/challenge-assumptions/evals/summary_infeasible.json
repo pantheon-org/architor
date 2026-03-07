@@ -1,0 +1,21 @@
+{
+  "total_infeasible": 4,
+  "infeasible_scenarios": [
+    {
+      "scenario": "Self-Correction When Conversation Becomes Agreeable",
+      "reasoning": "Instruction 8 requires the agent to notice that it has been agreeing with multiple consecutive decisions in an ongoing conversation and self-correct. This is inherently multi-turn behavior — the agent must have a prior conversation history where it has agreed with things before it can 'notice' the pattern. In a one-shot file-based eval there is no conversation history, so this behavior cannot be triggered or graded."
+    },
+    {
+      "scenario": "Phase 1 Medium Tension Calibration",
+      "reasoning": "Instruction 9 requires the agent to apply 'medium tension' during an initial proposal review. Grading tension level is subjective — the difference between 'medium' and 'high' tension cannot be reliably scored by a grader reviewing only the output file. Without objective binary criteria to distinguish medium tension from high or low, this scenario would not produce reliable eval signal."
+    },
+    {
+      "scenario": "Phase 3 Targeted Tension (Integration and Failure Modes)",
+      "reasoning": "Instruction 11 requires targeted tension focused on integration consistency, failure modes, and cross-cutting concerns. While the focus areas are testable individually, the 'targeted tension' calibration (i.e. not high, not low, but specifically targeted) is too subjective to grade reliably in a one-shot scenario. Coverage of failure mode and integration review is partially captured in scenario-4."
+    },
+    {
+      "scenario": "Phase 4 Low Tension Final Check",
+      "reasoning": "Instruction 12 requires the agent to switch to low tension for a final check — confirming completeness and that open issues are resolved rather than challenging decisions. Testing that an agent correctly reduces tension (i.e. stops pushing back hard) requires a baseline comparison against high-tension behavior in the same context, which cannot be established in a single one-shot eval."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "total_scenarios": 5,
+  "instructions_coverage": {
+    "total_instructions": 12,
+    "instructions_tested": 8,
+    "coverage_percentage": 67
+  },
+  "scenarios": [
+    {
+      "id": "scenario-0",
+      "capability": "Technology Proposal Challenge",
+      "instructions_covered": [1, 2]
+    },
+    {
+      "id": "scenario-1",
+      "capability": "Vague Requirements Quantification",
+      "instructions_covered": [1, 4, 5]
+    },
+    {
+      "id": "scenario-2",
+      "capability": "Over-Engineering Detection",
+      "instructions_covered": [1, 6]
+    },
+    {
+      "id": "scenario-3",
+      "capability": "Under-Engineering and Vague Approval Push Back",
+      "instructions_covered": [1, 3, 7]
+    },
+    {
+      "id": "scenario-4",
+      "capability": "Phase 2 High Tension Deep Dive",
+      "instructions_covered": [1, 10]
+    }
+  ],
+  "reason_distribution": {
+    "reminder": 1,
+    "new knowledge": 5,
+    "preference": 6
+  },
+  "uncovered_instructions": [
+    {
+      "id": 8,
+      "instruction": "Self-correct when conversation becomes too agreeable.",
+      "reason": "Moved to infeasible — requires multi-turn conversation history to detect agreement patterns."
+    },
+    {
+      "id": 9,
+      "instruction": "Phase 1 medium tension.",
+      "reason": "Moved to infeasible — see summary_infeasible.json."
+    },
+    {
+      "id": 11,
+      "instruction": "Phase 3 targeted tension.",
+      "reason": "Moved to infeasible — see summary_infeasible.json."
+    },
+    {
+      "id": 12,
+      "instruction": "Phase 4 low tension.",
+      "reason": "Moved to infeasible — see summary_infeasible.json."
+    }
+  ]
+}

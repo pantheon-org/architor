@@ -1,5 +1,9 @@
 # arch-agent
 
+[![npm version](https://img.shields.io/npm/v/arch-agent)](https://www.npmjs.com/package/arch-agent)
+[![license](https://img.shields.io/npm/l/arch-agent)](LICENSE)
+[![tests](https://img.shields.io/badge/tests-51%20passing-brightgreen)]()
+
 **Structured architecture design for AI-assisted development.**
 
 arch-agent turns [Claude Code](https://docs.anthropic.com/en/docs/claude-code) into an opinionated architecture reviewer that guides your team through a rigorous, phase-gated design process. It challenges assumptions, enforces decision gates, and produces a documented architecture — not just a generated wall of text.
@@ -31,6 +35,36 @@ Example decision log entry:
 - Trade-offs: Sacrifices independent deployment for operational simplicity
 - Risk: Module boundaries may need extraction to services at 10x scale
 ```
+
+Example component design output (abbreviated):
+```
+## Auth Service — Component Design
+
+Technology: Keycloak 24.0 (self-hosted) + PostgreSQL 16
+Pattern: OAuth 2.0 + OIDC, RS256 JWT tokens
+
+Integration Points:
+  IN:  POST /auth/token  ← API Gateway (client credentials)
+  IN:  POST /auth/login  ← Web Client (authorization code flow)
+  OUT: JWT validation    → All services (public key endpoint)
+
+Failure Modes:
+  - Keycloak down → Circuit breaker, return cached JWKS for 15min
+  - Database failover → Read replica promotion, ~30s token delay
+  - Token leak → Revocation endpoint + short-lived tokens (5min)
+
+Cross-Cutting Compliance:
+  ✓ Auth: RS256 JWT per Phase 2C decision DEC-007
+  ✓ Observability: Structured JSON logs, login attempt metrics
+  ✓ Deployment: Helm chart, horizontal pod autoscaler
+```
+
+## Who Is This For
+
+- **Tech leads** starting a new project who want structured design, not a blank whiteboard
+- **Architects** who want AI assistance with human control over every decision
+- **Teams** that need documented architecture decisions for compliance, onboarding, or audit
+- **Solo developers** building complex systems who want an adversarial reviewer to catch blind spots
 
 ## How It Works
 

@@ -2,6 +2,22 @@
 
 All notable changes to Architor are documented here.
 
+## [2.1.2] — 2026-03-07
+
+### Documentation overhaul
+
+- Converted all diagrams across the repository to Mermaid syntax (README, ARCHITECTURE.md, METHODOLOGY.md)
+- Added end-to-end workflow explanation with step-by-step journey
+- Added artifact flow diagram showing how architecture knowledge builds across phases
+- Added full e-commerce platform example scenario with per-phase artifacts
+- Added generated artifacts table with locations and timing
+- Added use case positioning table
+- Updated system-level diagram to show actual file paths
+- Replaced non-existent SVG references in ARCHITECTURE.md with Mermaid diagrams
+- Converted component lifecycle ASCII art to Mermaid state diagrams
+
+---
+
 ## [2.1.1] — 2026-03-07
 
 ### Repository improvements

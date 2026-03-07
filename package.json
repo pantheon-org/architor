@@ -1,6 +1,6 @@
 {
   "name": "arch-agent",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Turn Claude Code into a rigorous, phase-gated architecture design assistant",
   "license": "MIT",
   "author": "Architecture Agent Contributors",

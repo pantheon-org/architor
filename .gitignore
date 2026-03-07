@@ -13,6 +13,9 @@
 # Output (generated deliverables)
 output/architecture-document.md
 
+# Article drafts (not part of the package)
+article/
+
 # Node.js
 node_modules/
 npm-debug.log*

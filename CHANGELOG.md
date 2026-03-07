@@ -2,6 +2,18 @@
 
 All notable changes to Architor are documented here.
 
+## [2.1.1] — 2026-03-07
+
+### Repository improvements
+
+- Rewrote README for clarity: added problem statement, value proposition, use cases, output examples, and workflow diagram
+- Added npm keywords for discoverability: system-design, ai-agent, architecture-decision-record, adr, developer-tools
+- Added 19 GitHub repository topics covering AI, architecture, developer tools, and Claude Code
+- Updated GitHub repository description
+- Added article/ to .gitignore
+
+---
+
 ## [2.1.0] — 2026-03-02
 
 ### Import Existing Architecture

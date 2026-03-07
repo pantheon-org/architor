@@ -34,3 +34,7 @@ Thumbs.db
 # Python
 __pycache__/
 *.pyc
+
+# Agentic
+.tessl/
+**/tessl__*

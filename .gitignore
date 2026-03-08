@@ -41,3 +41,6 @@ __pycache__/
 
 # Machine-local Claude settings (enabledMcpjsonServers etc.)
 .claude/settings.local.json
+
+# Machine-local MCP server config (opt-in per contributor)
+.mcp.json

@@ -128,4 +128,8 @@ The skills in this project are packaged as [Tessl](https://tessl.io) tiles for v
 | `ahmed-habiba/challenge-assumptions` | `SKILL.md` | Adversarial reviewer personality |
 | `ahmed-habiba/architecture-patterns` | `SKILL.md` | Pattern knowledge base and selection criteria |
 
-The root `tessl.json` defines the project as `vendored` mode and pins the `tessl-labs/tessl-skill-eval-scenarios` dependency used by the eval runner. Tiles are currently `private: true`. To work with tiles: use the `mcp__tessl__*` MCP tools (search, install, status, update).
+The root `tessl.json` defines the project as `vendored` mode and pins the `tessl-labs/tessl-skill-eval-scenarios` dependency used by the eval runner. Tiles are currently `private: true`.
+
+The Tessl MCP server is **opt-in** — `.mcp.json` and `.claude/settings.local.json` are gitignored and must be created locally. Only set them up when running or publishing evals. See `docs/CONTRIBUTING.md` → "Running Evals" for setup instructions.
+
+When the `mcp__tessl__*` tools are active, use them to work with tiles (search, install, status, update, run evals). If they are not present, do not attempt to configure Tessl autonomously — direct the human contributor to the setup guide.

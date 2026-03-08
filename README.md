@@ -361,31 +361,9 @@ your-project/
 
 ## Tessl Integration
 
-The skills bundled with arch-agent are packaged as [Tessl](https://tessl.io) tiles — versioned, distributable skill units for Claude Code. Each skill has a `tile.json` manifest and a set of evaluation scenarios under `evals/`.
+The skills bundled with arch-agent are packaged as [Tessl](https://tessl.io) tiles for versioning, distribution, and evaluation. Tessl is optional — required only if you want to run skill evaluations or publish tiles.
 
-| Tile | Purpose |
-|------|---------|
-| `ahmed-habiba/architecture-methodology` | Enforces the 4-phase workflow; activates on any system design or architecture discussion |
-| `ahmed-habiba/state-manager` | Reads and writes `.arch/state.json` and `.arch/decisions.md`; tracks phase and component acceptance |
-| `ahmed-habiba/challenge-assumptions` | Adversarial reviewer that questions technology choices, scalability assumptions, and single points of failure |
-| `ahmed-habiba/architecture-patterns` | Knowledge base for pattern selection (microservices, monolith, serverless, event-driven, CQRS) with trade-off comparison |
-
-The root `tessl.json` configures the project in `vendored` mode and pins the `tessl-labs/tessl-skill-eval-scenarios` dependency used by the eval runner.
-
-### Working with tiles
-
-```bash
-# Check tile status and version info
-npx tessl status
-
-# Run evals against a skill tile
-npx tessl eval .claude/skills/architecture-methodology
-
-# Search the Tessl library
-npx tessl search architecture
-```
-
-Tiles are currently marked `private: true`. To publish a tile to the Tessl registry, set `"private": false` in the relevant `tile.json` and run `npx tessl publish`.
+For tile descriptions, setup instructions, eval commands, and publishing guidance, see [docs/CONTRIBUTING.md — Tessl Integration](docs/CONTRIBUTING.md#tessl-integration).
 
 ## CLI Reference
 

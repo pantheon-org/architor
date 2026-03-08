@@ -112,22 +112,33 @@ SVG diagrams in `docs/diagrams/` are hand-crafted. When editing:
 - Keep diagrams readable at both full size and GitHub preview size
 - Test rendering in a browser before submitting
 
-## Running Evals (Tessl)
+## Tessl Integration
 
-Skills are evaluated using [Tessl](https://tessl.io). The Tessl MCP server is **not auto-configured** — it is opt-in per contributor. Only set it up if you need to run or publish evals.
+The skills bundled with arch-agent are packaged as [Tessl](https://tessl.io) tiles — versioned, distributable skill units for Claude Code. Each tile lives under `.claude/skills/<name>/` alongside its evaluation scenarios.
 
-### Prerequisites
+| Tile | Purpose |
+|------|---------|
+| `ahmed-habiba/architecture-methodology` | Enforces the 4-phase workflow; activates on any system design or architecture discussion |
+| `ahmed-habiba/state-manager` | Reads and writes `.arch/state.json` and `.arch/decisions.md`; tracks phase and component acceptance |
+| `ahmed-habiba/challenge-assumptions` | Adversarial reviewer that questions technology choices, scalability assumptions, and single points of failure |
+| `ahmed-habiba/architecture-patterns` | Knowledge base for pattern selection (microservices, monolith, serverless, event-driven, CQRS) with trade-off comparison |
 
-Install the Tessl CLI:
+The root `tessl.json` configures the project in `vendored` mode and pins the `tessl-labs/tessl-skill-eval-scenarios` dependency used by the eval runner. Tiles are currently `private: true`.
+
+Eval scenarios live alongside each skill at `.claude/skills/<name>/evals/`. Each `task.md` describes one scenario. When adding or changing skill behaviour, add or update the relevant scenarios before submitting a PR.
+
+### Setup (opt-in)
+
+The Tessl MCP server is **not auto-configured** — `.mcp.json` and `.claude/settings.local.json` are gitignored. Only set this up if you need to run or publish evals.
+
+**1. Install and authenticate:**
 
 ```bash
 npm install -g tessl
 tessl login
 ```
 
-### Enable the MCP server
-
-Create a `.mcp.json` file at the repository root (it is gitignored and should not be committed):
+**2. Create `.mcp.json` at the repository root:**
 
 ```json
 {
@@ -141,7 +152,7 @@ Create a `.mcp.json` file at the repository root (it is gitignored and should no
 }
 ```
 
-Then create `.claude/settings.local.json` to activate it in Claude Code (also gitignored):
+**3. Create `.claude/settings.local.json` to activate it in Claude Code:**
 
 ```json
 {
@@ -154,7 +165,7 @@ Restart Claude Code. The `mcp__tessl__*` tools will be available.
 ### Running evals
 
 ```bash
-# Check tile status
+# Check tile status and version info
 tessl status
 
 # Run evals for a specific tile
@@ -162,13 +173,22 @@ tessl eval .claude/skills/architecture-methodology
 
 # Run all tiles
 tessl eval .claude/skills/
+
+# Search the Tessl library
+tessl search architecture
 ```
 
-Eval scenarios live alongside each skill at `.claude/skills/<name>/evals/`. Each `task.md` describes one scenario. When adding or changing skill behaviour, add or update the relevant scenarios before submitting a PR.
+### Publishing
+
+Tiles are currently `private: true`. To publish a tile to the Tessl registry, set `"private": false` in the relevant `tile.json` and run:
+
+```bash
+tessl publish
+```
 
 ### For agent contributors
 
-If you are an AI agent running in this repository, check whether the `mcp__tessl__*` tools are already loaded before attempting eval workflows. If they are not present, instruct the human to follow the setup above — do not attempt to install or configure Tessl autonomously.
+Check whether the `mcp__tessl__*` tools are already loaded before attempting eval workflows. If they are not present, instruct the human to follow the setup above — do not attempt to install or configure Tessl autonomously.
 
 ## Submitting Changes
 

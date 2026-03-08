@@ -38,3 +38,6 @@ __pycache__/
 # Agentic
 .tessl/
 **/tessl__*
+
+# Machine-local Claude settings (enabledMcpjsonServers etc.)
+.claude/settings.local.json

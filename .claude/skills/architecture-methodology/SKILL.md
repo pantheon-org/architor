@@ -13,30 +13,41 @@ Any conversation about system architecture, technology choices, component design
 | Phase | Name | Purpose |
 |-------|------|---------|
 | 1 | **Evaluation** | Analyse PRDs, extract functional and non-functional requirements, identify constraints and risks. No technology or component decisions yet. |
-| 2 | **Methodology** | Select architecture patterns (e.g. event-driven, microservices, monolith), establish high-level component boundaries, make technology stack decisions. |
+| 2A | **Pattern** | Select the architecture pattern (e.g. event-driven, microservices, monolith) and justify the choice. |
+| 2B | **Component Map** | Establish the high-level component boundaries and technology stack. |
+| 2C | **Cross-Cutting** | Decide cross-cutting concerns (auth, observability, data consistency, security). These become constraints for all Phase 3 component designs. |
 | 3 | **Components** | Design individual components sequentially. Each component must be explicitly accepted before the next begins. |
 | 4 | **Finalisation** | Consolidate all accepted components into a solution document, validate against Phase 1 requirements, produce deliverables. |
 
 ## State File: `.arch/state.json`
 
-Read this file before every architecture-related response. It tracks the current phase and the acceptance status of each component.
+ALWAYS read this file before every architecture-related response. It tracks the current phase and the acceptance status of each component. NEVER rely on conversation memory for phase state.
 
 **Example structure:**
 ```json
 {
-  "phase": 2,
-  "phase_name": "Methodology",
-  "components": [
-    { "id": 1, "name": "API Gateway", "status": "accepted" },
-    { "id": 2, "name": "Auth Service", "status": "in_progress" },
-    { "id": 3, "name": "Data Layer", "status": "pending" }
-  ],
-  "requirements_accepted": true,
-  "methodology_accepted": false
+  "current_phase": "methodology",
+  "phases": {
+    "evaluation": { "status": "accepted" },
+    "methodology": {
+      "status": "in_progress",
+      "sub_phase": "cross_cutting",
+      "pattern_accepted": true,
+      "components_overview_accepted": true,
+      "cross_cutting_accepted": false
+    }
+  },
+  "components": {
+    "api-gateway": { "status": "accepted" },
+    "auth-service": { "status": "in_progress" },
+    "data-layer": { "status": "pending" }
+  },
+  "decision_count": 7,
+  "reopens": { "count": 0, "max": 2 }
 }
 ```
 
-A component's `status` may be `pending`, `in_progress`, or `accepted`. A component is **accepted** when the user explicitly confirms the design (e.g. "looks good", "accepted", "approved") and its status is updated to `"accepted"` in state.
+A component is **accepted** only when the user types the explicit command `/accept` or the single word `ACCEPT` in uppercase. Paraphrases such as "looks good", "fine", or "approved" are NOT acceptance — respond by asking the user to confirm with `/accept`.
 
 ## Before Every Architecture-Related Response
 1. Read `.arch/state.json`
@@ -54,10 +65,10 @@ Before advancing to the next phase, verify all criteria are met:
 - [ ] `requirements_accepted` set to `true` in state
 
 **Phase 2 → Phase 3:**
-- [ ] Architecture pattern chosen and justified
-- [ ] High-level component list defined
-- [ ] Technology stack decided with rationale
-- [ ] `methodology_accepted` set to `true` in state
+- [ ] 2A: Architecture pattern chosen and justified (`pattern_accepted: true`)
+- [ ] 2B: High-level component map defined and technology stack decided (`components_overview_accepted: true`)
+- [ ] 2C: Cross-cutting concerns decided (`cross_cutting_accepted: true`)
+- [ ] All three sub-phases accepted; cross-cutting decisions recorded as constraints
 
 **Phase 3 → Phase 4:**
 - [ ] All components have `"status": "accepted"` in state

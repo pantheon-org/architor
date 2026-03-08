@@ -134,7 +134,7 @@ The Tessl MCP server is **not auto-configured** — `.mcp.json` and `.claude/set
 **1. Install and authenticate:**
 
 ```bash
-npm install -g tessl
+bun add -g tessl
 tessl login
 ```
 

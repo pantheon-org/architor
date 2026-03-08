@@ -127,6 +127,20 @@ The root `tessl.json` configures the project in `vendored` mode and pins the `te
 
 Eval scenarios live alongside each skill at `.claude/skills/<name>/evals/`. Each `task.md` describes one scenario. When adding or changing skill behaviour, add or update the relevant scenarios before submitting a PR.
 
+#### Inline file scaffolding convention
+
+Scenarios that require input files on disk embed them directly in `task.md` using the following delimiter format, which the Tessl eval runner parses to create files before the agent runs:
+
+```
+=============== FILE: .arch/state.json ===============
+{
+  "current_phase": "evaluation",
+  ...
+}
+```
+
+Each `=============== FILE: <path> ===============` block is written to the specified path relative to the sandbox working directory before the agent receives the task prompt. Use this pattern whenever a scenario depends on pre-existing files (state.json, decisions.md, PRDs, etc.).
+
 ### Setup (opt-in)
 
 The Tessl MCP server is **not auto-configured** — `.mcp.json` and `.claude/settings.local.json` are gitignored. Only set this up if you need to run or publish evals.
